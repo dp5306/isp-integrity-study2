@@ -13,6 +13,10 @@ public class MessageDigestExample {
 
         final String message = "We would like to provide data integrity.";
 
+        ///
+
+        System.out.println("Message: " + message);
+
         /*
          * STEP 1.
          * Select Message Digest algorithm and get new Message Digest object instance

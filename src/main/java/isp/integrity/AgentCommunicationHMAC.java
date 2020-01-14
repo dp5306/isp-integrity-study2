@@ -4,8 +4,10 @@ import fri.isp.Agent;
 import fri.isp.Environment;
 
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Arrays;
 
 /*
  * Message Authenticity and Integrity are provided using Hash algorithm and Shared Secret Key.
@@ -37,7 +39,14 @@ public class AgentCommunicationHMAC {
                 final byte[] pt = text.getBytes(StandardCharsets.UTF_8);
                 send("bob", pt);
 
+                print("Sent message %s as %s", new String(pt), hex(pt));
 
+                final Mac hmac = Mac.getInstance("HmacSHA256");
+                hmac.init(key);
+                final byte[] tag = hmac.doFinal(pt);
+                send("bob", tag);
+
+                print("Sent     hash %s", hex(tag));
             }
         });
 
@@ -51,6 +60,23 @@ public class AgentCommunicationHMAC {
                  *   - tag;
                  * - uses shared secret session key to verify the message
                  */
+
+                final byte[] message = receive("alice");
+                final byte[] tag = receive("alice");
+
+                print("received message %s as %s", new String(message), hex(message));
+                print("received   hash %s", hex(tag));
+
+                final Mac hmac = Mac.getInstance("HmacSHA256");
+                hmac.init(key);
+                final byte[] tag2 = hmac.doFinal(message);
+
+                print("calculated hash %s", hex(tag2));
+
+                if(Arrays.equals(tag, tag2))
+                    System.out.println("Tags are equal");
+                else
+                    System.out.println("Tags are NOT equal");
 
             }
         });

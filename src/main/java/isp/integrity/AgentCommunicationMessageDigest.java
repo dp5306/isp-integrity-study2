@@ -4,6 +4,8 @@ import fri.isp.Agent;
 import fri.isp.Environment;
 
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.Arrays;
 
 /**
  * An MITM example showing how merely using a collision-resistant hash
@@ -26,6 +28,15 @@ public class AgentCommunicationMessageDigest {
                 final byte[] message = "I hope you get this message intact. Kisses, Alice.".getBytes(StandardCharsets.UTF_8);
 
                 // TODO: Create the digest and send the (message, digest) pair
+
+                final MessageDigest digestAlgorithm = MessageDigest.getInstance("SHA-256");
+                final byte[] hashed_message = digestAlgorithm.digest(message);
+
+                send("mallory", message);
+                print("Sent message %s as %s", new String(message), hex(message));
+                send("mallory", hashed_message);
+                print("Sent hash %s", hex(hashed_message));
+
             }
         });
 
@@ -38,9 +49,19 @@ public class AgentCommunicationMessageDigest {
 
                 // TODO: Modify the message
 
+                print("MITM received message %s as %s", new String(message), hex(message));
+                print("MITM received hash %s", hex(tag));
+
+                final byte[] message2 = "I hope you get this message intact. Kisses, MITM.".getBytes(StandardCharsets.UTF_8);
+                final MessageDigest digestAlgorithm = MessageDigest.getInstance("SHA-256");
+                final byte[] tag2 = digestAlgorithm.digest(message2);
+
+                print("MITM sent modified message %s as %s", new String(message2), hex(message2));
+                print("MITM sent modified hash %s", hex(tag2));
+
                 // Forward the modified message
-                send("bob", message);
-                send("bob", tag);
+                send("bob", message2);
+                send("bob", tag2);
             }
         });
 
@@ -58,6 +79,18 @@ public class AgentCommunicationMessageDigest {
                 final byte[] tag = receive("alice");
 
                 // TODO: Check if the received (message, digest) pair is valid
+
+                print("bob received message %s as %s", new String(message), hex(message));
+                print("bob received hash %s", hex(tag));
+
+                final MessageDigest digestAlgorithm = MessageDigest.getInstance("SHA-256");
+                final byte[] hashed_message = digestAlgorithm.digest(message);
+                print("bob created  hash %s", hex(hashed_message));
+
+                if(Arrays.equals(tag, hashed_message))
+                    print("Tag checks out");
+                else
+                    print("Tag does not check out");
             }
         });
 

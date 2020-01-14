@@ -15,6 +15,8 @@ public class HMACExample {
 
         final String message = "We would like to provide data integrity for this message.";
 
+        /// Compare 2 hashes of the same message!!! Checks integrity
+
         /*
          * STEP 1.
          * Select HMAC algorithm and get new HMAC object instance.

@@ -20,13 +20,14 @@ import java.nio.charset.StandardCharsets;
  */
 public class GCMExample {
 
+    /// Authenticated Encryption providing both Integrity and Confidentiality
 
     public static void main(String[] args) throws Exception {
         // shared key
         final SecretKey sharedKey = KeyGenerator.getInstance("AES").generateKey();
 
         // the payload
-        final String message = "this is my message";
+        final String message = "We are providing Integrity and Confidentiality!";
         final byte[] pt = message.getBytes(StandardCharsets.UTF_8);
         System.out.printf("MSG: %s%n", message);
         System.out.printf("PT:  %s%n", Agent.hex(pt));
